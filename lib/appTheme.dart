@@ -19,7 +19,13 @@ class AppTheme{
       titleMedium: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.bold
-      )
+      ),
+      titleSmall: TextStyle(
+        fontSize: 18,
+      ),
+      bodyMedium: TextStyle(
+        fontSize: 22,
+      ),
     ) ,
     bottomNavigationBarTheme: BottomNavigationBarThemeData(
       selectedItemColor: AppColors.priamryColor,

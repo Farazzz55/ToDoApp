@@ -1,7 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:to_do_list_project/NewTask/edit_task.dart';
 import 'package:to_do_list_project/appColors.dart';
+import 'package:to_do_list_project/firebase_utilz.dart';
+import 'package:to_do_list_project/model/task_data_class.dart';
+
+import '../provider/list_provider.dart';
 
 class AddNewTask extends StatefulWidget{
   @override
@@ -10,10 +16,14 @@ class AddNewTask extends StatefulWidget{
 
 class _AddNewTaskState extends State<AddNewTask> {
   var formKey=GlobalKey<FormState>();
+  String task = '';
+  String details = '';
   var selectedTime=DateTime.now();
- 
+  late ListProvider listProvider;
+
   @override
   Widget build(BuildContext context) {
+    listProvider=Provider.of<ListProvider>(context);
     return  Form(
       key: formKey,
       child: Container(
@@ -52,7 +62,11 @@ class _AddNewTaskState extends State<AddNewTask> {
                     return null;
 
                   },
-
+                  onChanged: (value) {
+                    setState(() {
+                      task = value;
+                    });
+                  },
 
                 ),
                 TextFormField(
@@ -61,7 +75,8 @@ class _AddNewTaskState extends State<AddNewTask> {
                       hintText: 'task details',
                       hintStyle: TextStyle(
                           color: AppColors.lightGrey
-                      )
+                      ),
+
 
                   ),
                   validator: (value) {
@@ -69,6 +84,11 @@ class _AddNewTaskState extends State<AddNewTask> {
                       return("please enter task details");
                     }
                     return null;
+                  },
+                  onChanged: (value) {
+                    setState(() {
+                      details = value;
+                    });
                   },
 
                 ),
@@ -90,8 +110,8 @@ class _AddNewTaskState extends State<AddNewTask> {
                     radius: 30,
                     backgroundColor: AppColors.priamryColor,
                     child: IconButton(onPressed: (){
-                      if(formKey.currentState?.validate()==true){
-                      }
+                      addTask();
+
                     }, icon: Icon(Icons.check , color: AppColors.white,)),
                   ),
                 )
@@ -116,5 +136,27 @@ class _AddNewTaskState extends State<AddNewTask> {
 
     });
   }
+  void addTask() {
+    if (formKey.currentState?.validate() == true) {
+      Task newTask = Task(
+        title: task,
+        Details: details,
+        dateTime: selectedTime,
+      );
+      FirebaseUtilz.addTaskToFireStore(newTask).timeout(Duration(seconds:  1),onTimeout: ()
+      {
+        print('Task Added');
+
+
+      });
+      Navigator.pop(context);
+
+// Close the form after adding the task
+    }
+
+    listProvider.getAllTasksFromFireStore();
+
+  }
+
 }
 
