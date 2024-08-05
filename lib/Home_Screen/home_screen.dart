@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:to_do_list_project/Login_Screen/login_screen.dart';
 import 'package:to_do_list_project/appColors.dart';
 import 'package:to_do_list_project/list_tab/list_tab.dart';
+import 'package:to_do_list_project/provider/auth_user_provider.dart';
+import 'package:to_do_list_project/provider/list_provider.dart';
 import 'package:to_do_list_project/setting_tab/setting_tab.dart';
 
 import '../NewTask/add_new_task.dart';
@@ -18,16 +22,26 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var authProvider=Provider.of<AuthUserProvider>(context);
+    var listProvider=Provider.of<ListProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "To Do List",
+          "To Do List\nWelcome ${authProvider.currentUser!.userName!}!",
           style: GoogleFonts.poppins(
             textStyle: Theme.of(context).textTheme.titleLarge,
             color: AppColors.white,
           ),
         ),
         toolbarHeight: MediaQuery.of(context).size.height * 0.2,
+        actions: [
+          IconButton(onPressed: (){
+            listProvider.taskList=[];
+            authProvider.currentUser=null;
+            Navigator.of(context).pushReplacementNamed(LoginScreen.routeName);
+          }, icon: Icon(Icons.logout))
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

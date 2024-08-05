@@ -9,6 +9,7 @@ import 'package:to_do_list_project/Home_Screen/home_screen.dart';
 import 'package:to_do_list_project/Login_Screen/login_screen.dart';
 import 'package:to_do_list_project/NewTask/edit_task.dart';
 import 'package:to_do_list_project/appTheme.dart';
+import 'package:to_do_list_project/provider/auth_user_provider.dart';
 import 'package:to_do_list_project/provider/list_provider.dart';
 
 import 'model/task_data_class.dart';
@@ -23,13 +24,13 @@ void main() async {
         messagingSenderId: "706053045406",
         projectId: "todo-app-ca07b")
   ): await Firebase.initializeApp();
-  await FirebaseFirestore.instance.disableNetwork();
+ // await FirebaseFirestore.instance.disableNetwork();
 
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => ListProvider(),
-      child: MyApp(),
-    ),
+  runApp( MultiProvider(providers: [
+      ChangeNotifierProvider(create: (context) => ListProvider(),),
+    ChangeNotifierProvider(create: (context) => AuthUserProvider(),),
+  ] ,
+  child: MyApp(),)
   );
 }
 class MyApp extends StatelessWidget {
@@ -46,7 +47,7 @@ class MyApp extends StatelessWidget {
           CreateAccount.routeName: (context) => CreateAccount(),
           LoginScreen.routeName : (context)=> LoginScreen()
         },
-      initialRoute:CreateAccount.routeName,
+      initialRoute:LoginScreen.routeName,
       theme: AppTheme.LightTheme
 
     );

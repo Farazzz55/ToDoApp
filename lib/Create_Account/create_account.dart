@@ -4,11 +4,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:to_do_list_project/Create_Account/CustomTextFormField.dart';
 import 'package:to_do_list_project/Home_Screen/home_screen.dart';
 import 'package:to_do_list_project/Login_Screen/login_screen.dart';
 import 'package:to_do_list_project/appColors.dart';
 import 'package:to_do_list_project/dialog_utliz.dart';
+import 'package:to_do_list_project/firebase_utilz.dart';
+import 'package:to_do_list_project/model/user.dart';
+import 'package:to_do_list_project/provider/auth_user_provider.dart';
 
 class CreateAccount extends StatefulWidget{
   static String routeName='CreateAccScreen';
@@ -135,10 +139,18 @@ class _CreateAccountState extends State<CreateAccount> {
           email: emailController.text,
           password: passwordController.text,
         );
+        myUser myuser= myUser(
+            id: credential.user?.uid??' '
+            , userName:nameController.text,
+            email: emailController.text);
+        //provider bra el build == > listen
+        var authProvider=Provider.of<AuthUserProvider>(context,listen: false);
+        authProvider.updateUser(myuser);
+        await FirebaseUtilz.addUserToFirebase(myuser); // hafdl wa2fa fe el line dh lhad ma yt5zn fe el firestore
         DialogUtliz.hideLoading(context);
         DialogUtliz.showMessege(context: context, content: 'Register Successfully',ButtonOneName: 'Ok' ,
         ButtonOne: (){
-          Navigator.of(context).pushNamed(HomeScreen.routeName);
+          Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
         }) ;
         print('Register Success');
       } on FirebaseAuthException catch (e) {

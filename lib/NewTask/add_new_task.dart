@@ -7,6 +7,7 @@ import 'package:to_do_list_project/appColors.dart';
 import 'package:to_do_list_project/firebase_utilz.dart';
 import 'package:to_do_list_project/model/task_data_class.dart';
 
+import '../provider/auth_user_provider.dart';
 import '../provider/list_provider.dart';
 
 class AddNewTask extends StatefulWidget{
@@ -20,10 +21,14 @@ class _AddNewTaskState extends State<AddNewTask> {
   String details = '';
   var selectedTime=DateTime.now();
   late ListProvider listProvider;
+  late AuthUserProvider userProvider;
+
 
   @override
   Widget build(BuildContext context) {
     listProvider=Provider.of<ListProvider>(context);
+    userProvider= Provider.of<AuthUserProvider>(context);
+
     return  Form(
       key: formKey,
       child: Container(
@@ -143,18 +148,15 @@ class _AddNewTaskState extends State<AddNewTask> {
         Details: details,
         dateTime: selectedTime,
       );
-      FirebaseUtilz.addTaskToFireStore(newTask).timeout(Duration(seconds:  1),onTimeout: ()
-      {
+      FirebaseUtilz.addTaskToFireStore(newTask,userProvider.currentUser!.id!).then((value){
         print('Task Added');
-
-
       });
+      listProvider.getAllTasksFromFireStore(userProvider.currentUser!.id!);
       Navigator.pop(context);
 
-// Close the form after adding the task
     }
 
-    listProvider.getAllTasksFromFireStore();
+    listProvider.getAllTasksFromFireStore(userProvider.currentUser!.id!);
 
   }
 

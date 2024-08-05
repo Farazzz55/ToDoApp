@@ -1,11 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:to_do_list_project/Create_Account/create_account.dart';
 import 'package:to_do_list_project/Home_Screen/home_screen.dart';
+import 'package:to_do_list_project/firebase_utilz.dart';
+import 'package:to_do_list_project/model/user.dart';
 
 import '../Create_Account/CustomTextFormField.dart';
 import '../appColors.dart';
 import '../dialog_utliz.dart';
+import '../provider/auth_user_provider.dart';
 
 class LoginScreen extends StatefulWidget{
   @override
@@ -86,7 +91,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     backgroundColor: AppColors.priamryColor,
                   ),
                   ),
-                  TextButton(onPressed: (){}, child: Text('Create New Account',style: TextStyle(
+                  TextButton(onPressed: (){
+                    Navigator.of(context).pushNamed(CreateAccount.routeName);
+                  }, child: Text('Create New Account',style: TextStyle(
                     color: AppColors.priamryColor
                   ),))
 
@@ -106,8 +113,14 @@ class _LoginScreenState extends State<LoginScreen> {
       try {
         final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
             email: emailController.text,
-            password: passwordController.text
+            password: passwordController.text,
         );
+        var user =await FirebaseUtilz.readUserFromFirestore(credential.user?.uid??'');
+        if(user==null){
+          return;
+        }
+        var authProvider=Provider.of<AuthUserProvider>(context,listen: false);
+        authProvider.updateUser(user);
         DialogUtliz.hideLoading(context);
         print('Login Success');
       } on FirebaseAuthException catch (e) {
@@ -124,6 +137,6 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       }
     }
-    Navigator.of(context).pushNamed(HomeScreen.routeName);
+    Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
   }
 }

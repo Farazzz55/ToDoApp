@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../appColors.dart';
 import '../firebase_utilz.dart';
 import '../model/task_data_class.dart';
+import '../provider/auth_user_provider.dart';
 import '../provider/list_provider.dart';
 
 class DoneTask extends StatelessWidget{
@@ -13,6 +14,8 @@ class DoneTask extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     var listProvider=Provider.of<ListProvider>(context);
+    var userProvider= Provider.of<AuthUserProvider>(context);
+
     return Container(
       margin: EdgeInsets.all(10),
       child: Slidable(
@@ -28,11 +31,11 @@ class DoneTask extends StatelessWidget{
             SlidableAction(
               borderRadius: BorderRadius.circular(10),
               onPressed: (context){
-                FirebaseUtilz.DeleteTaskFromFireStore(task).timeout(Duration(seconds: 1)
+                FirebaseUtilz.DeleteTaskFromFireStore(task,userProvider.currentUser!.id!).timeout(Duration(seconds: 1)
                     ,onTimeout:(){
                       print('Task Deleted');
                     });
-                listProvider.getAllTasksFromFireStore();
+                listProvider.getAllTasksFromFireStore(userProvider.currentUser!.id!);
               },
               backgroundColor: Color(0xFFFE4A49),
               foregroundColor: Colors.white,

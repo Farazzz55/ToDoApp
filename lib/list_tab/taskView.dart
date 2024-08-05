@@ -8,6 +8,7 @@ import 'package:to_do_list_project/firebase_utilz.dart';
 import 'package:to_do_list_project/list_tab/done_task.dart';
 
 import '../model/task_data_class.dart';
+import '../provider/auth_user_provider.dart';
 import '../provider/list_provider.dart';
 
 class TaskView extends StatelessWidget {
@@ -18,6 +19,8 @@ class TaskView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var listProvider=Provider.of<ListProvider>(context);
+    var userProvider= Provider.of<AuthUserProvider>(context);
+
 
     return Container(
       margin: EdgeInsets.all(10),
@@ -35,11 +38,10 @@ class TaskView extends StatelessWidget {
             SlidableAction(
               borderRadius: BorderRadius.circular(10),
               onPressed: (context){
-                FirebaseUtilz.DeleteTaskFromFireStore(task).timeout(Duration(seconds: 1)
-                    ,onTimeout:(){
+                FirebaseUtilz.DeleteTaskFromFireStore(task,userProvider.currentUser!.id!).then((value){
                   print('Task Deleted');
-                    });
-                listProvider.getAllTasksFromFireStore();
+                });
+                listProvider.getAllTasksFromFireStore(userProvider.currentUser!.id!);
               },
               backgroundColor: Color(0xFFFE4A49),
               foregroundColor: Colors.white,
@@ -93,10 +95,10 @@ class TaskView extends StatelessWidget {
              ),
              IconButton(onPressed: (){
                task.isDone=true;
-               FirebaseUtilz.UpdateTaskDoneInFireStore(task).timeout(Duration(seconds: 1),onTimeout: (){
+               FirebaseUtilz.UpdateTaskDoneInFireStore(task,userProvider.currentUser!.id!).timeout(Duration(seconds: 1),onTimeout: (){
                  print('Task Updated');
                });
-               listProvider.getAllTasksFromFireStore();
+               listProvider.getAllTasksFromFireStore(userProvider.currentUser!.id!);
              }, icon: CircleAvatar(
                radius: 25,
                backgroundColor: AppColors.priamryColor,

@@ -5,6 +5,7 @@ import 'package:to_do_list_project/appColors.dart';
 import 'package:to_do_list_project/firebase_utilz.dart';
 
 import '../model/task_data_class.dart';
+import '../provider/auth_user_provider.dart';
 import '../provider/list_provider.dart';
 
 class EditTask extends StatefulWidget {
@@ -20,6 +21,8 @@ class _EditTaskState extends State<EditTask> {
   Widget build(BuildContext context) {
     var task=ModalRoute.of(context)!.settings.arguments as Task;
     var listProvider=Provider.of<ListProvider>(context);
+    var userProvider= Provider.of<AuthUserProvider>(context);
+
     return Stack(
       children: [
         Scaffold(
@@ -93,11 +96,11 @@ class _EditTaskState extends State<EditTask> {
                         task.title=title;
                         task.Details=details;
                         task.dateTime=selectedTime;
-                        FirebaseUtilz.UpdateTaskInFireStore(task).timeout(Duration(seconds: 1),onTimeout:
+                        FirebaseUtilz.UpdateTaskInFireStore(task,userProvider.currentUser!.id!).timeout(Duration(seconds: 1),onTimeout:
                             (){
                           print('TaskUpdated');
                         });
-                        listProvider.getAllTasksFromFireStore();
+                        listProvider.getAllTasksFromFireStore(userProvider.currentUser!.id!);
                         Navigator.pop(context);
 
                       },

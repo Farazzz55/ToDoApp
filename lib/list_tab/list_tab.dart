@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:to_do_list_project/firebase_utilz.dart';
 import 'package:to_do_list_project/list_tab/taskView.dart';
+import 'package:to_do_list_project/provider/auth_user_provider.dart';
 import 'package:to_do_list_project/provider/list_provider.dart';
 
 import '../model/task_data_class.dart';
@@ -20,8 +21,10 @@ class _ListTabState extends State<ListTab> {
   @override
   Widget build(BuildContext context) {
     var listProvider= Provider.of<ListProvider>(context);
+    var userProvider= Provider.of<AuthUserProvider>(context);
+
     if(listProvider.taskList.isEmpty){
-    listProvider.getAllTasksFromFireStore();
+    listProvider.getAllTasksFromFireStore(userProvider.currentUser!.id!);
     }
     return Column(
       children: [
@@ -29,7 +32,7 @@ class _ListTabState extends State<ListTab> {
           initialDate: listProvider.selcetDate,
           onDateChange: (selectedDate) {
             //`selectedDate` the new date selected.
-            listProvider.changeSelectDate(selectedDate);
+            listProvider.changeSelectDate(selectedDate,userProvider.currentUser!.id!);
           },
           headerProps: const EasyHeaderProps(
             monthPickerType: MonthPickerType.switcher,
