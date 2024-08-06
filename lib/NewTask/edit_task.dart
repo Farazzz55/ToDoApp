@@ -14,14 +14,14 @@ class EditTask extends StatefulWidget {
   State<EditTask> createState() => _EditTaskState();
 }
 class _EditTaskState extends State<EditTask> {
-  var selectedTime=DateTime.now();
-  late String title;
-  late String details;
+  var selectedTime = DateTime.now();
+  late TextEditingController titleController;
+  late TextEditingController detailsController;
   @override
   Widget build(BuildContext context) {
     var task=ModalRoute.of(context)!.settings.arguments as Task;
-    var listProvider=Provider.of<ListProvider>(context);
-    var userProvider= Provider.of<AuthUserProvider>(context);
+    titleController = TextEditingController(text: task.title);
+    detailsController = TextEditingController(text: task.Details);
 
     return Stack(
       children: [
@@ -58,19 +58,14 @@ class _EditTaskState extends State<EditTask> {
                   ),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                   TextField(
-                    onChanged: (value) {
-                      title = value;
-                    },
-                    controller: TextEditingController(text: task.title),
+                    controller: titleController,
 
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                   TextField(
-                    onChanged: (value) {
-                      details = value;
-                    },
-                    controller: TextEditingController(text: task.Details),
+
+                    controller: detailsController,
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.02),
@@ -93,16 +88,7 @@ class _EditTaskState extends State<EditTask> {
                   Center(
                     child: ElevatedButton(
                       onPressed: () {
-                        task.title=title;
-                        task.Details=details;
-                        task.dateTime=selectedTime;
-                        FirebaseUtilz.UpdateTaskInFireStore(task,userProvider.currentUser!.id!).timeout(Duration(seconds: 1),onTimeout:
-                            (){
-                          print('TaskUpdated');
-                        });
-                        listProvider.getAllTasksFromFireStore(userProvider.currentUser!.id!);
-                        Navigator.pop(context);
-
+                        editTask(task);
                       },
                       child: Text(
                         'Save Changes',
@@ -137,4 +123,19 @@ class _EditTaskState extends State<EditTask> {
       });
     }
   }
+  void editTask(Task task){
+    var listProvider=Provider.of<ListProvider>(context,listen: false);
+    var userProvider= Provider.of<AuthUserProvider>(context,listen: false);
+    task.title=titleController.text;
+    task.Details=detailsController.text;
+    task.dateTime=selectedTime;
+    FirebaseUtilz.UpdateTaskInFireStore(task,userProvider.currentUser!.id!).timeout(Duration(seconds: 1),onTimeout:
+        (){
+      print('TaskUpdated');
+    });
+    listProvider.getAllTasksFromFireStore(userProvider.currentUser!.id!);
+    Navigator.pop(context);
+  }
+
+
 }

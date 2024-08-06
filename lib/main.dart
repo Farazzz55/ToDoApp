@@ -24,7 +24,6 @@ void main() async {
         messagingSenderId: "706053045406",
         projectId: "todo-app-ca07b")
   ): await Firebase.initializeApp();
- // await FirebaseFirestore.instance.disableNetwork();
 
   runApp( MultiProvider(providers: [
       ChangeNotifierProvider(create: (context) => ListProvider(),),
