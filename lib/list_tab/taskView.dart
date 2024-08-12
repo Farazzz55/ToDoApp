@@ -6,20 +6,26 @@ import 'package:to_do_list_project/NewTask/edit_task.dart';
 import 'package:to_do_list_project/appColors.dart';
 import 'package:to_do_list_project/firebase_utilz.dart';
 import 'package:to_do_list_project/list_tab/done_task.dart';
+import 'package:to_do_list_project/provider/app_config_provider.dart';
 
-import '../model/task_data_class.dart';
+import '../model/Task.dart';
 import '../provider/auth_user_provider.dart';
 import '../provider/list_provider.dart';
 
-class TaskView extends StatelessWidget {
+class TaskView extends StatefulWidget {
   Task task;
   TaskView({required this.task});
 
+  @override
+  State<TaskView> createState() => _TaskViewState();
+}
 
+class _TaskViewState extends State<TaskView> {
   @override
   Widget build(BuildContext context) {
     var listProvider=Provider.of<ListProvider>(context);
     var userProvider= Provider.of<AuthUserProvider>(context);
+    var provider = Provider.of<AppConfigProvider>(context);
 
 
     return Container(
@@ -38,7 +44,7 @@ class TaskView extends StatelessWidget {
             SlidableAction(
               borderRadius: BorderRadius.circular(10),
               onPressed: (context){
-                FirebaseUtilz.DeleteTaskFromFireStore(task,userProvider.currentUser!.id!).then((value){
+                FirebaseUtilz.DeleteTaskFromFireStore(widget.task,userProvider.currentUser!.id!).then((value){
                   print('Task Deleted');
                 });
                 listProvider.getAllTasksFromFireStore(userProvider.currentUser!.id!);
@@ -50,8 +56,7 @@ class TaskView extends StatelessWidget {
             ),
             SlidableAction(
               onPressed: (context){
-                Navigator.of(context).pushNamed(EditTask.routeName,
-               arguments: task);
+                Navigator.of(context).pushNamed(EditTask.routeName,arguments: widget.task);
               },
               backgroundColor: Color(0xFF21B7CA),
               foregroundColor: Colors.white,
@@ -65,7 +70,8 @@ class TaskView extends StatelessWidget {
         child: Container(
           height: MediaQuery.of(context).size.height*0.15,
           decoration: BoxDecoration(
-            color: AppColors.white,
+              color: provider.appTheme == ThemeMode.light?
+              AppColors.white : AppColors.Dark,
             borderRadius: BorderRadius.circular(15),
           ),
           child: Row(
@@ -86,16 +92,19 @@ class TaskView extends StatelessWidget {
                  mainAxisAlignment: MainAxisAlignment.center,
                  crossAxisAlignment: CrossAxisAlignment.start,
                  children: [
-                   Text(task.title ,style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                   Text(widget.task.title ,style: Theme.of(context).textTheme.titleMedium?.copyWith(
                    color: AppColors.priamryColor ,
                ),)  ,
-                   Text(task.Details, style: Theme.of(context).textTheme.titleSmall,)
+                   Text(widget.task.Details, style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                     color: provider.appTheme == ThemeMode.light?
+                     AppColors.Dark : AppColors.white,
+                   ),)
                  ],
                ),
              ),
              IconButton(onPressed: (){
-               task.isDone=true;
-               FirebaseUtilz.UpdateTaskDoneInFireStore(task,userProvider.currentUser!.id!).timeout(Duration(seconds: 1),onTimeout: (){
+               widget.task.isDone=true;
+               FirebaseUtilz.UpdateTaskDoneInFireStore(widget.task,userProvider.currentUser!.id!).timeout(Duration(seconds: 1),onTimeout: (){
                  print('Task Updated');
                });
                listProvider.getAllTasksFromFireStore(userProvider.currentUser!.id!);

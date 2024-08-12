@@ -1,13 +1,13 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_date_timeline/easy_date_timeline.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:to_do_list_project/firebase_utilz.dart';
 import 'package:to_do_list_project/list_tab/taskView.dart';
+import 'package:to_do_list_project/provider/app_config_provider.dart';
 import 'package:to_do_list_project/provider/auth_user_provider.dart';
 import 'package:to_do_list_project/provider/list_provider.dart';
 
-import '../model/task_data_class.dart';
+import '../appColors.dart';
+import '../model/Task.dart';
 import 'done_task.dart';
 
 class ListTab extends StatefulWidget{
@@ -22,6 +22,7 @@ class _ListTabState extends State<ListTab> {
   Widget build(BuildContext context) {
     var listProvider= Provider.of<ListProvider>(context);
     var userProvider= Provider.of<AuthUserProvider>(context);
+    var provider=Provider.of<AppConfigProvider>(context);
 
     if(listProvider.taskList.isEmpty){
     listProvider.getAllTasksFromFireStore(userProvider.currentUser!.id!);
@@ -34,14 +35,49 @@ class _ListTabState extends State<ListTab> {
             //`selectedDate` the new date selected.
             listProvider.changeSelectDate(selectedDate,userProvider.currentUser!.id!);
           },
-          headerProps: const EasyHeaderProps(
+          headerProps:  EasyHeaderProps(
             monthPickerType: MonthPickerType.switcher,
+            monthStyle:
+            TextStyle(
+                color: provider.appTheme == ThemeMode.light?
+                AppColors.bgDark : AppColors.white
+            ),
+
             dateFormatter: DateFormatter.fullDateDayAsStrMY(),
           ),
-          dayProps: const EasyDayProps(
+          dayProps: EasyDayProps(
             dayStructure: DayStructure.dayStrDayNum,
+            todayStyle: DayStyle(
+                dayNumStyle: TextStyle(
+                    color: provider.appTheme == ThemeMode.light?
+                    AppColors.bgDark : AppColors.white
+                ),
+                dayStrStyle: TextStyle(
+                    fontSize: 15,
+                    color: provider.appTheme == ThemeMode.light?
+                    AppColors.bgDark : AppColors.white
+                )
+
+            ),
+            inactiveDayStyle: DayStyle(
+              dayNumStyle: TextStyle(
+                  color: provider.appTheme == ThemeMode.light?
+                  AppColors.bgDark : AppColors.white
+              ),
+              dayStrStyle: TextStyle(
+                  fontSize: 15,
+                  color: provider.appTheme == ThemeMode.light?
+                  AppColors.bgDark : AppColors.white
+              )
+            ),
             activeDayStyle: DayStyle(
-              decoration: BoxDecoration(
+              dayStrStyle: TextStyle(
+                fontSize: 15,
+                  color: provider.appTheme == ThemeMode.light?
+                  AppColors.bgDark : AppColors.white
+
+              ),
+              decoration:  BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(8)),
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
@@ -52,6 +88,7 @@ class _ListTabState extends State<ListTab> {
                   ],
                 ),
               ),
+
             ),
           ),
         ),

@@ -9,13 +9,15 @@ import 'package:to_do_list_project/Home_Screen/home_screen.dart';
 import 'package:to_do_list_project/Login_Screen/login_screen.dart';
 import 'package:to_do_list_project/NewTask/edit_task.dart';
 import 'package:to_do_list_project/appTheme.dart';
+import 'package:to_do_list_project/provider/app_config_provider.dart';
 import 'package:to_do_list_project/provider/auth_user_provider.dart';
 import 'package:to_do_list_project/provider/list_provider.dart';
 
-import 'model/task_data_class.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final appConfigProvider = AppConfigProvider();
+  await appConfigProvider.loadSettings();
   Platform.isAndroid?
   await Firebase.initializeApp(
     options: FirebaseOptions(
@@ -27,7 +29,8 @@ void main() async {
 
   runApp( MultiProvider(providers: [
       ChangeNotifierProvider(create: (context) => ListProvider(),),
-    ChangeNotifierProvider(create: (context) => AuthUserProvider(),),
+      ChangeNotifierProvider(create: (context) => AuthUserProvider(),),
+      ChangeNotifierProvider(create: (context) => appConfigProvider,),
   ] ,
   child: MyApp(),)
   );
@@ -38,6 +41,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    var provider = Provider.of<AppConfigProvider>(context);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
         routes: {
@@ -47,8 +51,9 @@ class MyApp extends StatelessWidget {
           LoginScreen.routeName : (context)=> LoginScreen()
         },
       initialRoute:LoginScreen.routeName,
-      theme: AppTheme.LightTheme
-
+      theme:AppTheme.LightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: provider.appTheme,
     );
   }
 }

@@ -3,8 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:to_do_list_project/appColors.dart';
 import 'package:to_do_list_project/firebase_utilz.dart';
-
-import '../model/task_data_class.dart';
+import 'package:to_do_list_project/provider/app_config_provider.dart';
+import '../model/Task.dart';
 import '../provider/auth_user_provider.dart';
 import '../provider/list_provider.dart';
 
@@ -14,15 +14,31 @@ class EditTask extends StatefulWidget {
   State<EditTask> createState() => _EditTaskState();
 }
 class _EditTaskState extends State<EditTask> {
-  var selectedTime = DateTime.now();
+  DateTime selectedTime = DateTime.now();
   late TextEditingController titleController;
   late TextEditingController detailsController;
+  late Task task;
+  bool isInitialized = false;
   @override
+  @override
+  void initState() {
+    super.initState();
+    titleController = TextEditingController();
+    detailsController = TextEditingController();
+  }
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!isInitialized) {
+      task = ModalRoute.of(context)!.settings.arguments as Task;
+      titleController.text = task.title;
+      detailsController.text = task.Details;
+      selectedTime = task.dateTime;
+      isInitialized = true;
+    }
+  }
   Widget build(BuildContext context) {
     var task=ModalRoute.of(context)!.settings.arguments as Task;
-    titleController = TextEditingController(text: task.title);
-    detailsController = TextEditingController(text: task.Details);
-
+    var provider = Provider.of<AppConfigProvider>(context);
     return Stack(
       children: [
         Scaffold(
@@ -31,17 +47,20 @@ class _EditTaskState extends State<EditTask> {
               "To Do List",
               style: GoogleFonts.poppins(
                 textStyle: Theme.of(context).textTheme.titleLarge,
-                color: AppColors.white,
+                  color: provider.appTheme == ThemeMode.light?
+                  AppColors.white : AppColors.bgDark
               ),
             ),
             toolbarHeight: MediaQuery.of(context).size.height * 0.2,
           ),
-          backgroundColor: AppColors.bgLight,
+          backgroundColor:provider.appTheme == ThemeMode.light?
+        AppColors.bgLight : AppColors.bgDark,
         ),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 170, horizontal: 25),
           child: Material(
-            color: AppColors.white,
+            color: provider.appTheme == ThemeMode.light?
+            AppColors.white : AppColors.Dark,
             child: Container(
               width: MediaQuery.of(context).size.width * 0.9,
               height: MediaQuery.of(context).size.width * 2,
@@ -53,31 +72,42 @@ class _EditTaskState extends State<EditTask> {
                     child: Text('Edit Task', style: GoogleFonts.poppins(
                       textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontSize: 20,
+                          color: provider.appTheme == ThemeMode.light?
+                          AppColors.Dark : AppColors.white
                       ),
                     )),
                   ),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                   TextField(
                     controller: titleController,
-
-                    style: Theme.of(context).textTheme.bodyMedium,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: provider.appTheme == ThemeMode.light?
+                        AppColors.Dark : AppColors.white
+                    ),
                   ),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                   TextField(
-
                     controller: detailsController,
-                    style: Theme.of(context).textTheme.bodyMedium,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: provider.appTheme == ThemeMode.light?
+                        AppColors.Dark : AppColors.white
+                    )
                   ),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                   Text(
                     'Select Time',
                     textAlign: TextAlign.start,
-                    style: Theme.of(context).textTheme.bodyMedium,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: provider.appTheme == ThemeMode.light?
+                        AppColors.Dark : AppColors.white
+                    ),
                   ),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                   Center(
                     child: InkWell(
-                      onTap: showDate,
+                      onTap: (){
+                        showDate();
+                      },
                       child: Text(
                         '${selectedTime.month}/${selectedTime.day}/${selectedTime.year}',
                         style: TextStyle(fontSize: 20, color: AppColors.lightGrey),
@@ -93,7 +123,8 @@ class _EditTaskState extends State<EditTask> {
                       child: Text(
                         'Save Changes',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.white,
+                            color: provider.appTheme == ThemeMode.light?
+                            AppColors.white : AppColors.Dark
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
@@ -136,6 +167,4 @@ class _EditTaskState extends State<EditTask> {
     listProvider.getAllTasksFromFireStore(userProvider.currentUser!.id!);
     Navigator.pop(context);
   }
-
-
 }

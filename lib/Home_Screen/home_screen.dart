@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:to_do_list_project/Login_Screen/login_screen.dart';
 import 'package:to_do_list_project/appColors.dart';
 import 'package:to_do_list_project/list_tab/list_tab.dart';
+import 'package:to_do_list_project/provider/app_config_provider.dart';
 import 'package:to_do_list_project/provider/auth_user_provider.dart';
 import 'package:to_do_list_project/provider/list_provider.dart';
 import 'package:to_do_list_project/setting_tab/setting_tab.dart';
@@ -24,14 +25,19 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     var authProvider=Provider.of<AuthUserProvider>(context);
     var listProvider=Provider.of<ListProvider>(context);
+    var provider=Provider.of<AppConfigProvider>(context);
+
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "To Do List\nWelcome ${authProvider.currentUser!.userName!}!",
+          selectedIndex == 1 ? 'Setting' :
+          "To Do List\nWelcome ${authProvider.currentUser?.userName ?? " "}!",
           style: GoogleFonts.poppins(
             textStyle: Theme.of(context).textTheme.titleLarge,
-            color: AppColors.white,
+            color: provider.appTheme == ThemeMode.light?
+                AppColors.white : AppColors.bgDark
+            ,
           ),
         ),
         toolbarHeight: MediaQuery.of(context).size.height * 0.2,
@@ -55,6 +61,8 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
+        color: provider.appTheme == ThemeMode.light?
+        AppColors.white : AppColors.Dark,
         padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.height*0.01,),
         elevation: 0,
         shape: CircularNotchedRectangle(

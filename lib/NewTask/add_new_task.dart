@@ -5,8 +5,8 @@ import 'package:provider/provider.dart';
 import 'package:to_do_list_project/NewTask/edit_task.dart';
 import 'package:to_do_list_project/appColors.dart';
 import 'package:to_do_list_project/firebase_utilz.dart';
-import 'package:to_do_list_project/model/task_data_class.dart';
 
+import '../model/Task.dart';
 import '../provider/auth_user_provider.dart';
 import '../provider/list_provider.dart';
 
@@ -19,7 +19,7 @@ class _AddNewTaskState extends State<AddNewTask> {
   var formKey=GlobalKey<FormState>();
   String task = '';
   String details = '';
-  var selectedTime=DateTime.now();
+  DateTime selectedTime=DateTime.now();
   late ListProvider listProvider;
   late AuthUserProvider userProvider;
 
@@ -102,7 +102,6 @@ class _AddNewTaskState extends State<AddNewTask> {
                   textStyle:TextStyle(
                     fontSize: 20
                   ),
-
                 ), ),
                 Center(child: InkWell(
                     onTap: (){

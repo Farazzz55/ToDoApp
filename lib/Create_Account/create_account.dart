@@ -1,17 +1,14 @@
-import 'dart:ui';
-
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:to_do_list_project/Create_Account/CustomTextFormField.dart';
 import 'package:to_do_list_project/Home_Screen/home_screen.dart';
-import 'package:to_do_list_project/Login_Screen/login_screen.dart';
 import 'package:to_do_list_project/appColors.dart';
 import 'package:to_do_list_project/dialog_utliz.dart';
 import 'package:to_do_list_project/firebase_utilz.dart';
 import 'package:to_do_list_project/model/user.dart';
+import 'package:to_do_list_project/provider/app_config_provider.dart';
 import 'package:to_do_list_project/provider/auth_user_provider.dart';
 
 class CreateAccount extends StatefulWidget{
@@ -34,10 +31,12 @@ class _CreateAccountState extends State<CreateAccount> {
 
   @override
   Widget build(BuildContext context) {
+    var provider=Provider.of<AppConfigProvider>(context);
     return Stack(
       children: [
        Container(
-         color: AppColors.bgLight,
+         color: provider.appTheme == ThemeMode.light?
+         AppColors.bgLight : AppColors.bgDark,
          child: Image.asset('assets/images/background.png',fit: BoxFit.fill, width: double.infinity, height: double.infinity,),
        ),
         Scaffold(

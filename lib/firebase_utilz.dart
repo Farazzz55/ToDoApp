@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:to_do_list_project/model/task_data_class.dart';
 import 'package:to_do_list_project/model/user.dart';
+
+import 'model/Task.dart';
 
 class FirebaseUtilz{
   static CollectionReference<Task> getTaskCollection(String uid){
@@ -30,7 +31,7 @@ class FirebaseUtilz{
     return taskColltionName.doc(task.id).update({
     'title' : task.title ,
       'Details' : task.Details ,
-      'DateTime' : task.dateTime ,
+      'DateTime' : task.dateTime.millisecondsSinceEpoch , // edited
      });
   }
    static CollectionReference<myUser> getUsersCollection() {

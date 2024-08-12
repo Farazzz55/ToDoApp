@@ -5,8 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:to_do_list_project/Create_Account/create_account.dart';
 import 'package:to_do_list_project/Home_Screen/home_screen.dart';
 import 'package:to_do_list_project/firebase_utilz.dart';
-import 'package:to_do_list_project/model/user.dart';
-
+import 'package:to_do_list_project/provider/app_config_provider.dart';
 import '../Create_Account/CustomTextFormField.dart';
 import '../appColors.dart';
 import '../dialog_utliz.dart';
@@ -28,10 +27,12 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController passwordController=TextEditingController();
 
   Widget build(BuildContext context) {
+    var provider=Provider.of<AppConfigProvider>(context);
     return Stack(
       children: [
         Container(
-          color: AppColors.bgLight,
+          color: provider.appTheme == ThemeMode.light?
+          AppColors.bgLight: AppColors.bgDark,
           child: Image.asset('assets/images/background.png',fit: BoxFit.fill, width: double.infinity, height: double.infinity,),
         ),
         Scaffold(
@@ -52,7 +53,6 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 children: [
                   SizedBox(height: MediaQuery.of(context).size.height*0.3,),
-
                   CustomTextFormField(label: 'Email',
                     controller:emailController ,
                     validator: (text){
@@ -106,37 +106,81 @@ class _LoginScreenState extends State<LoginScreen> {
 
     );
   }
-
-  void login ()async {
-    if(formKey.currentState!.validate()){
-      DialogUtliz.showLoading(context: context, messege: 'loading');
+  void login() async {
+    if (formKey.currentState!.validate()) {
+      DialogUtliz.showLoading(context: context, messege: 'Loading');
       try {
         final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-            email: emailController.text,
-            password: passwordController.text,
+          email: emailController.text,
+          password: passwordController.text,
         );
-        var user =await FirebaseUtilz.readUserFromFirestore(credential.user?.uid??'');
-        if(user==null){
-          return;
-        }
-        var authProvider=Provider.of<AuthUserProvider>(context,listen: false);
-        authProvider.updateUser(user);
         DialogUtliz.hideLoading(context);
-        print('Login Success');
+        DialogUtliz.showMessege(
+          context: context,
+          content: 'Login Successful',
+          ButtonOneName: 'OK',
+          ButtonOne: () {
+            Navigator.pushAndRemoveUntil(context,
+              MaterialPageRoute(builder: (context) => HomeScreen()),
+                  (Route<dynamic> route) => false,);
+          },
+        );
+        var user = await FirebaseUtilz.readUserFromFirestore(credential.user?.uid ?? '');
+        if (user != null) {
+          var authProvider = Provider.of<AuthUserProvider>(context, listen: false);
+          authProvider.updateUser(user);
+        }
       } on FirebaseAuthException catch (e) {
         DialogUtliz.hideLoading(context);
-        DialogUtliz.showMessege(context: context, content: e.toString());
-        if (e.code == 'user-not-found') {
-          DialogUtliz.hideLoading(context);
-          DialogUtliz.showMessege(context: context, content: 'No user found for that email.');
-          print('No user found for that email.');
+        if (e.code == 'invalid-email') {
+          DialogUtliz.showMessege(
+              context: context,
+              content: 'The email address is not valid.',
+              ButtonOneName: 'Try Again' ,
+              ButtonOne: (){
+                Navigator.of(context).pushNamed(HomeScreen.routeName);
+              }
+          );
+        } else if (e.code == 'user-not-found') {
+          DialogUtliz.showMessege(
+              context: context,
+              content: 'No user found for that email.',
+              ButtonOneName: 'Try Again' ,
+              ButtonOne: (){
+                Navigator.of(context).pushNamed(LoginScreen.routeName);
+              }
+          );
         } else if (e.code == 'wrong-password') {
-          DialogUtliz.hideLoading(context);
-          DialogUtliz.showMessege(context: context, content: 'Wrong password provided for that user.');
-          print('Wrong password provided for that user.');
+          DialogUtliz.showMessege(
+              context: context,
+              content: 'Wrong password provided for that user.',
+              ButtonOneName: 'Try Again' ,
+              ButtonOne: (){
+                Navigator.of(context).pushNamed(LoginScreen.routeName);
+              }
+          );
+        } else {
+          DialogUtliz.showMessege(
+              context: context,
+              content: 'Login failed. Please try again.',
+              ButtonOneName: 'Try Again' ,
+              ButtonOne: (){
+                Navigator.of(context).pushNamed(LoginScreen.routeName);
+              });
         }
+      }  catch (e) {
+        DialogUtliz.hideLoading(context);
+        DialogUtliz.showMessege(
+          context: context,
+          content: e.toString(),
+          ButtonOneName: 'Try Again',
+          ButtonOne: () {
+            Navigator.of(context).pushNamed(LoginScreen.routeName);
+          },
+        );
       }
     }
-    Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
   }
+
+
 }

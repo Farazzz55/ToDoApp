@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
+import 'package:to_do_list_project/provider/app_config_provider.dart';
 
 import '../appColors.dart';
 import '../firebase_utilz.dart';
-import '../model/task_data_class.dart';
+import '../model/Task.dart';
 import '../provider/auth_user_provider.dart';
 import '../provider/list_provider.dart';
 
@@ -15,6 +16,7 @@ class DoneTask extends StatelessWidget{
   Widget build(BuildContext context) {
     var listProvider=Provider.of<ListProvider>(context);
     var userProvider= Provider.of<AuthUserProvider>(context);
+    var provider =Provider.of<AppConfigProvider>(context);
 
     return Container(
       margin: EdgeInsets.all(10),
@@ -49,7 +51,8 @@ class DoneTask extends StatelessWidget{
         child: Container(
           height: MediaQuery.of(context).size.height*0.15,
           decoration: BoxDecoration(
-            color: AppColors.white,
+            color: provider.appTheme == ThemeMode.light?
+            AppColors.white : AppColors.Dark,
             borderRadius: BorderRadius.circular(15),
           ),
           child: Row(

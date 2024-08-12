@@ -12,6 +12,8 @@ class AppColors{
   static Color bgLight=Color(0xffDFECDB);
   static Color bgDark=Color(0xff060E1E);
   static Color lightGrey=Color(0xffA9A9A9);
+  static Color Dark=Color(0xff141922);
+
 
 
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:to_do_list_project/appColors.dart';
+import 'package:to_do_list_project/provider/app_config_provider.dart';
 
 class CustomTextFormField extends StatelessWidget{
   String label;
@@ -11,9 +13,14 @@ class CustomTextFormField extends StatelessWidget{
   , this.keyboardType=TextInputType.text,this.obscureText=false});
   @override
   Widget build(BuildContext context) {
+    var provider=Provider.of<AppConfigProvider>(context);
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: TextFormField(
+        style: TextStyle(
+            color: provider.appTheme == ThemeMode.light?
+            AppColors.Dark : AppColors.white
+        ),
         decoration: InputDecoration(
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(15),
@@ -44,13 +51,17 @@ class CustomTextFormField extends StatelessWidget{
                   width: 2
               )
           ),
-          label: Text(label),
+          label: Text(label,style:
+            TextStyle(
+                color: provider.appTheme == ThemeMode.light?
+                AppColors.Dark : AppColors.white
+            ),),
 
         ),
         validator: validator,
         controller: controller,
         keyboardType: keyboardType,
-        obscureText: obscureText ,
+        obscureText: obscureText  ,
 
 
       ),
