@@ -48,58 +48,58 @@ class _LoginScreenState extends State<LoginScreen> {
             centerTitle: true,
           ),
           body: Form(
-            key: formKey,
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  SizedBox(height: MediaQuery.of(context).size.height*0.3,),
-                  CustomTextFormField(label: 'Email',
-                    controller:emailController ,
-                    validator: (text){
-                      if (text== null || text.trim().isEmpty){
-                        return'Please Enter Valid Email';
+              key: formKey,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    SizedBox(height: MediaQuery.of(context).size.height*0.3,),
+                    CustomTextFormField(label: 'Email',
+                      controller:emailController ,
+                      validator: (text){
+                        if (text== null || text.trim().isEmpty){
+                          return'Please Enter Valid Email';
+                        }
+                        final bool emailValid =
+                        RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                            .hasMatch(text);
+                        if(!emailValid){
+                          return'Please Write A Correct Email';
+                        }
+                        return null ;
                       }
-                      final bool emailValid =
-                      RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                          .hasMatch(text);
-                      if(!emailValid){
-                        return'Please Write A Correct Email';
-                      }
-                      return null ;
-                    }
-                    ,
-                    keyboardType: TextInputType.emailAddress,),
-                  CustomTextFormField(label: 'Password',
-                    controller:passwordController ,
-                    validator:(text){
-                      if (text== null || text.trim().isEmpty){
-                        return'Please Enter Valid Password';
-                      }
-                      return null ;
+                      ,
+                      keyboardType: TextInputType.emailAddress,),
+                    CustomTextFormField(label: 'Password',
+                      controller:passwordController ,
+                      validator:(text){
+                        if (text== null || text.trim().isEmpty){
+                          return'Please Enter Valid Password';
+                        }
+                        return null ;
 
-                    } ,
-                    obscureText:true ,
-                    keyboardType: TextInputType.phone ,),
-                  SizedBox(height: MediaQuery.of(context).size.height*0.02,),
-                  ElevatedButton(onPressed: (){
-                    login();
-                  }, child: Text('Login',style: GoogleFonts.poppins(
-                    textStyle: Theme.of(context).textTheme.titleLarge!.copyWith(
-                        color: AppColors.white
-                    ) ,
-                  ), ) , style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.priamryColor,
-                  ),
-                  ),
-                  TextButton(onPressed: (){
-                    Navigator.of(context).pushNamed(CreateAccount.routeName);
-                  }, child: Text('Create New Account',style: TextStyle(
-                    color: AppColors.priamryColor
-                  ),))
+                      } ,
+                      obscureText:true ,
+                      keyboardType: TextInputType.phone ,),
+                    SizedBox(height: MediaQuery.of(context).size.height*0.02,),
+                    ElevatedButton(onPressed: (){
+                      login();
+                    }, child: Text('Login',style: GoogleFonts.poppins(
+                      textStyle: Theme.of(context).textTheme.titleLarge!.copyWith(
+                          color: AppColors.white
+                      ) ,
+                    ), ) , style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.priamryColor,
+                    ),
+                    ),
+                    TextButton(onPressed: (){
+                      Navigator.of(context).pushNamed(CreateAccount.routeName);
+                    }, child: Text('Create New Account',style: TextStyle(
+                        color: AppColors.priamryColor
+                    ),))
 
-                ],
-              ),
-            )
+                  ],
+                ),
+              )
           ),
         )
       ],
